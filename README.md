@@ -3,7 +3,7 @@
 Arduino library for the AD5764 DAC.
 
 ## *EVAL|AD5764EB Board*
-### Set Link Pins (*Documentation: Table 4 [pg4], Default - Table 1 [pg3]*):
+### Link Pin Settings (*Documentation: Table 4 [pg4], Default - Table 1 [pg3]*): 03 July 2019
 
   | Link | Connection (Default) | Abv Description               | Current                    |
   | ---- | :------------------: | ----------------------------- | -------------------------- |
