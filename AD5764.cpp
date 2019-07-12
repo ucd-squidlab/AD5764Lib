@@ -29,13 +29,8 @@
 #define LOAD_DATA   5
 
 //converts a decimal value into a value between 0-65535, so it can be used by the DAC
-<<<<<<< HEAD
 #define VREFIN 5.0
 #define CONVERT_VALUE2DAC(vout) ((uint16_t)(16384.0 * ((vout/VREFIN) + 2)))
-=======
-#define VREFIN 5
-#define CONVERT_VALUE2DAC(vout) (int(-16384 * (((float)vout / VREFIN) + 2)))
->>>>>>> 5f4d724bdcf1b54da456365aaea0e5a6aa6ad7fd
 
 AD5764::AD5764() { }
 AD5764::~AD5764() { }
@@ -71,7 +66,6 @@ void AD5764::SetupAD5764(int cs, int ldac, int clr) {
 }
 
 //sets the output on the specified DAC channel
-<<<<<<< HEAD
 //the data word is a value between 0-65535 in Binary encoding
 
 // void AD5764::SetDataRegister(float vout, int dac_channel) {
@@ -94,16 +88,6 @@ void AD5764::SetDataRegister(uint16_t vout, int dac_channel) {
 	//to set the data register in the DAC, we use the following bits:
 	//WRITE | DATA_REG | DAC_Address | data
 
-=======
-//the data word is a value between 0-65535 in 2's complement encoding
-void AD5764::SetDataRegister(float value, int dac_channel) {
-	//to set the data register in the DAC, we use the following bits:
-	//WRITE | DATA_REG | DAC_Address | data
-
-	//convert the passed decimal value into a value between 0-65535
-	short data = CONVERT_VALUE2DAC(value);
-
->>>>>>> 5f4d724bdcf1b54da456365aaea0e5a6aa6ad7fd
 	//make an array of bytes to send in MSB first order
 	uint8_t data_array[3];
 	data_array[0] = WRITE | DATA_REG | dac_channel;
