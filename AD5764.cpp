@@ -29,8 +29,8 @@
 #define LOAD_DATA   5
 
 //converts a decimal value into a value between 0-65535, so it can be used by the DAC
-#define VREFIN 5
-#define CONVERT_VALUE2DAC(vout) ((int)(16384 * ((vout/VREFIN) + 2)))
+#define VREFIN 5.0
+#define CONVERT_VALUE2DAC(vout) ((uint16_t)(16384.0 * ((vout/VREFIN) + 2)))
 
 AD5764::AD5764() { }
 AD5764::~AD5764() { }
@@ -48,12 +48,10 @@ void AD5764::SetupAD5764(int cs, int ldac, int clr) {
 	SPI.setBitOrder(_cs, MSBFIRST);
 	
 	//set clock divider for DAC
-	SPI.setClockDivider(_cs, SPI_CLOCK_DIV64);
+	//SPI.setClockDivider(_cs, SPI_CLOCK_DIV64);
 	
 	//set data mode for dac
 	SPI.setDataMode(_cs, SPI_MODE1);
-
-	SPI.usingInterrupt(48);
 
 	//set pin modes for LDAC and CLR pins
 	pinMode(_ldac, OUTPUT);
@@ -68,19 +66,34 @@ void AD5764::SetupAD5764(int cs, int ldac, int clr) {
 }
 
 //sets the output on the specified DAC channel
-//the data word is a value between 0-65535 in 2's complement encoding
-void AD5764::SetDataRegister(float vout, int dac_channel) {
+//the data word is a value between 0-65535 in Binary encoding
+
+// void AD5764::SetDataRegister(float vout, int dac_channel) {
+// 	//to set the data register in the DAC, we use the following bits:
+// 	//WRITE | DATA_REG | DAC_Address | data
+
+// 	uint16_t data = CONVERT_VALUE2DAC(vout);
+
+// 	//make an array of bytes to send in MSB first order
+// 	uint8_t data_array[3];
+// 	data_array[0] = WRITE | DATA_REG | dac_channel;
+// 	data_array[1] = (data & 0xFF00) >> 8;
+// 	data_array[2] = (data & 0x00FF);
+
+// 	//transfer the data to the DAC
+// 	SPI.transfer(_cs, data_array, 3);
+// }
+
+void AD5764::SetDataRegister(uint16_t vout, int dac_channel) {
 	//to set the data register in the DAC, we use the following bits:
 	//WRITE | DATA_REG | DAC_Address | data
 
-	short data = CONVERT_VALUE2DAC(vout);
-
 	//make an array of bytes to send in MSB first order
-	byte data_array[3];
+	uint8_t data_array[3];
 	data_array[0] = WRITE | DATA_REG | dac_channel;
-	data_array[1] = (data & 0xFF00) >> 8;
-	data_array[2] = (data & 0x00FF);
+	data_array[1] = (vout & 0xFF00) >> 8;
+	data_array[2] = (vout & 0x00FF);
 
 	//transfer the data to the DAC
-	SPI.transfer(_cs, data_array, 3);
+	SPI.transfer(_cs, data_array, 3);	
 }

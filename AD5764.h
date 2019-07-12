@@ -18,7 +18,7 @@ class AD5764 {
   void SetupAD5764(int cs, int ldac, int clr);
 
   //set the output of the DAC on one of the 4 DAC channels
-  void SetDataRegister(float vout, int dac_channel);
+  void SetDataRegister(uint16_t vout, int dac_channel);
 
   private:
   int _cs, _ldac, _clr;
