@@ -63,6 +63,9 @@ void AD5764::SetupAD5764(int cs, int ldac, int clr) {
 
 	//the DAC has a startup reset method, which will automatically clear the DAC on start
 	digitalWrite(_clr, HIGH);    //not going to clear the DAC, must be driven high
+
+	//place DAC into known state ( 0 on all channels )
+	SetDataRegister(CONVERT_VALUE2DAC(0), DAC_ALL);
 }
 
 //sets the output on the specified DAC channel
