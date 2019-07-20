@@ -4,32 +4,37 @@
 
 //DAC symbols
 
-//Defines for the input shift regsiter bit map, designed to be OR'd together to create a valid input for the AD5764
+//All tables references AD5764 Data Sheet Rev F
+//Table 9: Defines for the input shift regsiter bit map, designed to be OR'd together to create a valid input for the AD5764
 
-//Read/Write bit (R, W)
+//Read/Write bit (R, W), Table 10
 #define READ  1 << 7
 #define WRITE 0
 
-//Register select bits (REG0, REG1, REG2)
+//Function select bits (REG0, REG1, REG2), Table 10
 #define FUNCTION_REG  0 << 3
 #define DATA_REG      2 << 3
 #define COURSE_REG    3 << 3
 #define FINE_REG      4 << 3
 #define OFFSET_REG    5 << 3
 
-//Course gain options
+//Course gain options, Table 15
 #define COURSE_GAIN_0 0
 #define COURSE_GAIN_1 1
 #define COURSE_GAIN_2 2
 
-//Function select bits (A2, A1, A0, if function register is selected) 
+//Function select bits (sets [A2, A1, A0], when FUNCTION_REG selected), Table 11
 #define NOP 0
 #define LOCAL_GROUND_OFFSET_ADJUST 1
 #define CLEAR_DATA  4
 #define LOAD_DATA   5
 
-//converts a decimal value into a value between 0-65535, so it can be used by the DAC
+//DAC Refrence Voltage
 #define VREFIN 5.0
+
+/***  Current coding expecting voltage preconverted, therefore following isn't being used. ***/
+//converts a decimal value into a value between 0-65535, so it can be used by the DAC
+//max voltage output ±10V (default), set by course gain register
 #define CONVERT_VALUE2DAC(vout) ((uint16_t)(16384.0 * ((vout/VREFIN) + 2)))
 
 AD5764::AD5764() { }
@@ -57,9 +62,9 @@ void AD5764::SetupAD5764(int cs, int ldac, int clr) {
 	pinMode(_ldac, OUTPUT);
 	pinMode(_clr, OUTPUT);
 
-	//write pin values 
-	//on the eval board, there is a jumper that can be used to ground the LDAC pin, so this would be unnecessary 
-	digitalWrite(_ldac, LOW);    //we will not use LDAC, so it will be driven high, dac will automatically respoind with rising edge of the chip select signal
+	//write pin values
+	//eval-AD5764 board, LK8 jumper is currently driven (A) (if connected to ground, would be unnecessary) 
+	digitalWrite(_ldac, LOW);    //we will not use LDAC, so it will be driven low, dac will automatically respoind with rising edge of the chip select signal
 
 	//the DAC has a startup reset method, which will automatically clear the DAC on start
 	digitalWrite(_clr, HIGH);    //not going to clear the DAC, must be driven high
@@ -85,7 +90,8 @@ void AD5764::SetupAD5764(int cs, int ldac, int clr) {
 // }
 
 void AD5764::SetDataRegister(uint16_t vout, int dac_channel) {
-	//to set the data register in the DAC, we use the following bits:
+	//generate DAC Input Shift Register Bit Map (24bits), Table 9 with data in binary coding (Table 7)
+	//using following bits to generate map:
 	//WRITE | DATA_REG | DAC_Address | data
 
 	//make an array of bytes to send in MSB first order
@@ -95,5 +101,5 @@ void AD5764::SetDataRegister(uint16_t vout, int dac_channel) {
 	data_array[2] = (vout & 0x00FF);
 
 	//transfer the data to the DAC
-	SPI.transfer(_cs, data_array, 3);	
+	SPI.transfer(_cs, data_array, 3);
 }
