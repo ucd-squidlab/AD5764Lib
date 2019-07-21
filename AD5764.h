@@ -1,7 +1,7 @@
 #ifndef AD5764_H_
 #define AD5764_H_
 
-//DAC channels (sets [A0, A1, A2] for data, course, gain, fine gain, or offset registers selected)
+//DAC channels (for data, course, gain, fine gain, or offset registers selected)
 #define DAC_A   0
 #define DAC_B   1
 #define DAC_C   2
